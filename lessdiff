@@ -1,0 +1,192 @@
+#!/usr/bin/env bash
+#
+# lessdiff (version: 0.0.4-1):
+#
+#   The problem is simple to understand: when working in a desktop environment I
+#   have many shells open (in KDE I use Konsole, under macOS I use the default
+#   Terminal app) and I configure each tab to show the name of the currently
+#   running process. But if it is more than one page of output I will need to
+#   pipe it through a pager like 'less'. The latter part is perhaps even more
+#   necessary when working at the console.
+#
+#   Anyway: when the diff is piped to less the tab will be called less: the
+#   currently running process (though this is configurable I assume in the use
+#   case that the tab is configured to the running process).
+#
+#   But I know I'm using a pager! It's far more convenient if I can see what the
+#   original file/directory is all the more if I'm seeing pages of output or if
+#   I am even looking at more than one diff (it happens!).
+#
+#   The variable LESSDIFF defines what diff to use; more specifically it defines
+#   how to configure the invocation. You can set this in the alias for lessdiff
+#   in e.g. your .bashrc file (or in macOS .bash_profile). I like coloured
+#   output so I define LESSDIFF to be /usr/bin/colordiff (see below) (or
+#   whatever path it is in your system).
+#
+#   The variable LESSDIFF_DIFF is the default diff i.e. /usr/bin/diff. This is
+#   used to detect if LESSDIFF is diff (that is "${LESSDIFF_DIFF}" itself (which
+#   would break the script) as well as making it possible to redefine the
+#   default diff (much like the example below where I redefine LESSDIFF to be
+#   /usr/bin/colordiff). If LESSDIFF_DIFF is the same value as LESSDIFF then
+#   LESSDIFF is cleared which means it uses the unfiltered version of the
+#   function.
+#
+#   The variable LESSDIFF_LESS is the pager (and options) to pipe the output of
+#   the diff to the pager. By default it's '/usr/bin/less -r'. Note that the -r
+#   option says that it should print raw control codes. This is important for
+#   colours but the caveat is that it could cause display problems. To get round
+#   this problem you could have a different alias e.g. lessdiff_colour and
+#   lessdiff but all my uses this is not necessary.
+#
+#
+# EXAMPLES:
+#
+#   The following:
+#
+#	alias lessdiff='LESSDIFF=/usr/bin/colordiff lessdiff'
+#
+#   aliases the diff (that overrides that is what the default i.e. LESSDIFF_DIFF
+#   output is piped to LESSDIFF) to be /usr/bin/colordiff. This translates to:
+#
+#	LESSDIFF=/usr/bin/colordiff lessdiff
+#
+#   Which by default would equate to:
+#
+#	/usr/bin/diff [...] | colordiff | /usr/bin/less -r
+#
+#
+#   This would override the less options so e.g. it quits if there's only one
+#   page of output:
+#
+#	alias lessdiff='LESSDIFF=/usr/bin/colordiff  LESSDIFF_LESS="/usr/bin/less -rF" lessdiff'
+#
+#
+#   The script tries its best to defend against LESSDIFF being LESSDIFF_DIFF. It
+#   does this by stripping spaces and anything beyond from the variables
+#   LESSDIFF_DIFF and LESSDIFF so that it's only the file name (binary). I do
+#   not know if it detects every possible issue but at the very least it will
+#   defend against both of these (note in the second that there is an option
+#   specified for the LESSDIFF_DIFF variable):
+#
+#	alias lessdiff='LESSDIFF=/usr/bin/colordiff LESSDIFF_DIFF="/usr/bin/colordiff" lessdiff'
+#	alias lessdiff='LESSDIFF="/usr/bin/diff -r" LESSDIFF_DIFF="/usr/bin/diff -r" lessdiff'
+#
+#   In these cases the LESSDIFF variable would be cleared: there would be no
+#   filtering so it would run diff and pipe the output to the LESSDIFF_DIFF.
+#
+# XXX The script does NOT guard against LESSDIFF_LESS not existing and it does
+# NOT check if it can be executed. The trouble is that this would require
+# setting a default LESS to reset it and at this time I am too tired after these
+# changes to fix this.
+#
+#
+# INSTALLATION:
+#
+#   If you have access to make simply run make install as root (or use sudo).
+#
+#   To 'install' otherwise put the file somewhere in your path. You will then
+#   have access to lessdiff. Then as above if you make an alias you can
+#   customise it more e.g. my example of colordiff.
+#
+# PORTABILITY
+#
+#   I do not know how portable the bash variable substitution is. At the same
+#   time this is meant to be a bash script and to not rely on other utilities
+#   like sed(1). It could be adapted to rely on sed and be more portable but I
+#   haven't implemented that (well I did first but I wanted shellcheck(1) to not
+#   complain).
+#
+#   Previously I used -v to determine if the shell variable is set but not all
+#   bash versions (e.g. default bash in macOS) support that so now it uses -n.
+#
+#
+# LICENCE
+#
+#   This is public domain; use however you wish. The only 'impressive' thing
+#   here (and 'impressive' is a huge exaggeration) is the concept; the script
+#   itself is very simple (though I comment on it). I would appreciate if you
+#   keep the headers intact however. Thank you.
+#
+#
+# CHANGES (since 19 Oct 2019):
+#
+#   Last updated: 03 Feb 2023
+#   (Possibly original date: 25 Oct 2016)
+#
+# Script history (since 19 Oct 2019):
+#
+#   * 19/Oct/2019 (lessdiff version: 0.0.2-1)
+#   - Make much more customisable: now the default diff as well as the less
+#     invocation can be configured. LESSDIFF_DIFF Is the default diff and
+#     LESSDIFF_LESS is the less invocation.
+#
+#   - Defend against LESSDIFF being the same as the default diff (now in
+#     LESSDIFF_DIFF).
+#
+#   - More documentation with examples etc.
+#
+#   * 03/Feb/2023 (lessdiff version: 0.0.3-1)
+#   - Use -n instead -f v as not all bash versions support -v.
+#
+#   * 04/Feb/2023 (lessdiff version: 0.0.4-1)
+#   - Check that the number of args specified is two.
+#   - Use -r for directories.
+#
+
+# The diff to use (this also is used to detect if LESSDIFF is the same as
+# LESSDIFF_DIFF which would lead to breakage of the script). You can override
+# this but if you set it to the same thing as LESSDIFF (which I do not set by
+# default) lessdiff will clear LESSDIFF. By default this variable is simply
+# /usr/bin/diff:
+LESSDIFF_DIFF="/usr/bin/diff -r"
+
+# What pager and options to enable. Here raw control codes (for colours) is
+# enabled. If you want less to quit if it's no more than one page of output pass
+# in the -F option too:
+LESSDIFF_LESS="/usr/bin/less -r"
+
+function _lessdiff_unfiltered()
+{
+    ${LESSDIFF_DIFF} -r "${@}" | \
+    # Pass to less -r (for raw control code output specific to ANSI 'colours'
+    # i.e.  for colordiff and also for accents etc.). If you only want paged
+    # output for more than one page you can specify -F to quit less if there is
+    # only one page.
+    ${LESSDIFF_LESS}
+}
+function _lessdiff_filtered()
+{
+    # Run diff with options passed as well as the files.
+    ${LESSDIFF_DIFF} -r "${@}" | \
+    # Pipe it to the filter: if it's `colordiff' then colourise the output, if
+    # any; diff errors are reported to stderr so if there is nothing on
+    # stdout colordiff (or whatever the filter) won't have anything to filter.
+    "${LESSDIFF}" | \
+    #
+    #	    /usr/bin/less -r -F -F to quit less if there is
+    ${LESSDIFF_LESS}
+}
+
+if [[ $# -ne 2 ]]; then
+    echo "usage: $(basename "$0") <file> <file>" 1>&2
+    exit 1
+fi
+
+# Make sure that if LESSDIFF is defined that it's not only executable but
+# that it's not the same thing as LESSDIFF_DIFF; if neither of these criterion are
+# met then it's cleared out thus not piping the diff output to it. This
+# prevents a problem like:
+#
+#	lessdiff: line 158: /usr/bin/diff -r: No such file or directory
+#
+# or so.
+[[ -n "${LESSDIFF}" && -x "${LESSDIFF//[[:space:]]*/}" && \
+    "${LESSDIFF//[[:space:]]*/}" != "${LESSDIFF_DIFF//[[:space:]]*/}" ]] || LESSDIFF=""
+
+# If LESSDIFF isn't an empty string (e.g. it's /usr/bin/colordiff) we want
+# to use filtered lessdiff.
+if [[ ! -z "$LESSDIFF" ]]; then
+    _lessdiff_filtered "${@}"
+else # otherwise unfiltered.
+    _lessdiff_unfiltered "${@}"
+fi

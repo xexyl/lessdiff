@@ -1,0 +1,5 @@
+# .gitignore
+#
+# vim swap files
+.sw[a-z]
+.*.sw[a-z]
