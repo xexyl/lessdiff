@@ -137,6 +137,9 @@
 #   - Check that the number of args specified is two.
 #   - Use -r for directories.
 #
+#   * 25/Jul/2024 (lessdiff version: 1.0.0 2024-25-07)
+#   - Make a public GitHub repo at https://github.com/xexyl/lessdiff.
+#
 
 # The diff to use (this also is used to detect if LESSDIFF is the same as
 # LESSDIFF_DIFF which would lead to breakage of the script). You can override

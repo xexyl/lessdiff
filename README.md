@@ -1,4 +1,4 @@
-# lessdiff (version: 0.0.4-1)
+# lessdiff
 
 # What is `lessdiff(1)` and why might I want to use it?
 
