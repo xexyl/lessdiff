@@ -25,7 +25,7 @@ don't always use it - but it's always useful in a terminal application).
 Anyway: when the `diff(1)` is piped to `less(1)` the tab will be called `less`:
 the currently running process (though this is configurable, in my uses
 the tab is configured to be named to the running process, which causes the
-problem but allows for something much more useful[^0]).
+problem but allows for something much more useful[^1]).
 
 But I know I'm using a pager! It's **far more convenient if I can see what the
 _ORIGINAL_ command that I'm piping to `less(1)` is**, not the pager itself, and
@@ -52,7 +52,7 @@ These sections explain how to use the tool.
 
 The variable `LESSDIFF` defines what `diff(1)` to use; more specifically it defines
 how to configure the invocation. You can set this in the alias for `lessdiff`
-in e.g. your `.bashrc` file (or in macOS `.bash_profile`[^1]). I like coloured
+in e.g. your `.bashrc` file (or in macOS `.bash_profile`[^2]). I like coloured
 output so I define `LESSDIFF` to be `/usr/bin/colordiff` (see below) (or
 whatever path it is in your system).
 
@@ -77,10 +77,10 @@ and `lessdiff` but all my uses this is not necessary. Nevertheless, one can
 certainly use `-R` but this is not tested.
 
 
-[^0]: This includes the fact I can use `colordiff(1)` which is incredibly
+[^1]: This includes the fact I can use `colordiff(1)` which is incredibly
 useful.
 
-[^1]: Yes I know that the default shell in macOS has been for years now,
+[^2]: Yes I know that the default shell in macOS has been for years now,
 `zsh(1)` but I have never liked `zsh(1)`: far from it. This script has not even
 been tested with `zsh(1)` and it almost certainly never will be either.
 
