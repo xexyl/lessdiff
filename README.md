@@ -132,10 +132,9 @@ In these cases the `LESSDIFF` variable would be cleared: there would be no
 filtering so it would run `diff` and pipe the output to the `LESSDIFF_DIFF`.
 
 
-## Example use:
+## Example uses
 
-For any example below (one, or if I add any later, all), I have `lessdiff`
-aliased as:
+For the examples below I have `lessdiff` aliased as:
 
 
 ```sh
@@ -144,7 +143,8 @@ alias lessdiff='LESSDIFF=/opt/local/bin/colordiff lessdiff'
 
 as I am writing this with macOS and `colordiff` installed with MacPorts.
 
-### `lessdiff README.md lessdiff`
+
+### Show diff, piped through `less`, of README.md and lessdiff itself:
 
 This first example is quite contrived and would not normally be useful but it
 shows the multi-paged output.
@@ -157,6 +157,31 @@ This will be quite a long output of a coloured `diff(1)` piped through `less`
 but the tab will show, if configured correctly (which is outside the scope of
 this document as it depends on what terminal application you are using), the
 files diffed, rather than just `less`.
+
+### Specifying options to `diff(1)`
+
+If you need to specify an option to `diff(1)` just specify the option before the
+two files (or paths) to diff. For instance:
+
+```sh
+lessdiff -s README.md README.md
+```
+
+should show that the files are identical.
+
+
+
+## Example invalid invocation:
+
+Okay but what happens if you mess up the invocation? For instance what happens
+if you input only an option to `diff(1)` and a single file. Try:
+
+```sh
+lessdiff -s README.md
+```
+
+and you'll see a syntax error though you'll have to exit `less` first (by
+default).
 
 
 # Caveats and warnings:
@@ -175,6 +200,9 @@ on this, which is not the date I made this a repo) this would require setting a
 default `LESS` to reset it and at this time (when I first started writing the
 README.md which was quite some time back, not 25 July 2024 when I turned this
 into a GitHub repo) I am too tired after these changes to fix this.
+
+On the other hand, `LESSDIFF_DIFF` is checked if it can be executed and if not
+it will be reset to an empty string for the default.
 
 
 # Installation:

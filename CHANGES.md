@@ -25,3 +25,9 @@ invocation can be configured. `LESSDIFF_DIFF` Is the default `diff` and
 - Check that the number of args specified is two.
 - Use `-r` for directories.
 
+## 25/Jul/2024 (lessdiff version 1.0.0 2024-25-07)
+
+- Allow diff options to be specified more easily. This means that one can cause
+a syntax error if they specify an option and a file as it now just checks that
+the number of args is >= 2. Of course it was possible to create a syntax error
+already so this hardly matters.

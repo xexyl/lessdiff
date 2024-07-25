@@ -175,8 +175,8 @@ function _lessdiff_filtered()
     ${LESSDIFF_LESS}
 }
 
-if [[ $# -ne 2 ]]; then
-    echo "usage: $(basename "$0") <file> <file>" 1>&2
+if [[ $# -lt 2 ]]; then
+    echo "usage: $(basename "$0") [diff options] <file> <file>" 1>&2
     exit 1
 fi
 
