@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 #
-# lessdiff (version: 0.0.4-1):
+# lessdiff (version: 1.0.0 2024-25-07):
+#
+#   For a much more detailed description, see the README.md at the GitHub repo
+#   which is also where you can find the most up to date version:
+#   https://github.com/xexyl/lessdiff. The below is the original description
+#   and changes up to version 0.0.4-1.
 #
 #   The problem is simple to understand: when working in a desktop environment I
 #   have many shells open (in KDE I use Konsole, under macOS I use the default
